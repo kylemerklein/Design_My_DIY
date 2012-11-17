@@ -100,4 +100,37 @@ describe User do
 
   end
 
+  describe "expire" do
+
+    before(:each) do
+      @user = User.create!(@attr)
+    end
+
+    it "sends an email to user" do
+      @user.expire
+      ActionMailer::Base.deliveries.last.to.should == [@user.email]
+    end
+
+  end
+
+  describe "#update_plan" do
+    before do
+      @user = FactoryGirl.create(:user, email: "test@example.com")
+      @role1 = FactoryGirl.create(:role, name: "silver")
+      @role2 = FactoryGirl.create(:role, name: "gold")
+      @user.add_role(@role1.name)
+    end
+
+    it "updates a users role" do
+      @user.roles.first.name.should == "silver"
+      @user.update_plan(@role2)
+      @user.roles.first.name.should == "gold"
+    end
+
+    it "wont remove original role from database" do
+      @user.update_plan(@role2)
+      Role.all.count.should == 2
+    end
+  end
+
 end

@@ -2,7 +2,7 @@
 
 def create_visitor
   @visitor ||= { :name => "Testy McUserton", :email => "example@example.com",
-    :password => "please", :password_confirmation => "please" }
+    :password => "please", :password_confirmation => "please", :role => "silver" }
 end
 
 def find_user
@@ -20,6 +20,7 @@ def create_user
   create_visitor
   delete_user
   @user = FactoryGirl.create(:user, email: @visitor[:email])
+  @user.add_role(@visitor[:role])
 end
 
 def delete_user
@@ -29,7 +30,7 @@ end
 
 def sign_up
   delete_user
-  visit '/users/sign_up'
+  visit '/users/sign_up/?plan=silver'
   fill_in "Name", :with => @visitor[:name]
   fill_in "Email", :with => @visitor[:email]
   fill_in "Password", :with => @visitor[:password]
@@ -47,7 +48,7 @@ end
 
 ### GIVEN ###
 Given /^I am not logged in$/ do
-  visit '/users/sign_out'
+  visit destroy_user_session_path
 end
 
 Given /^I am logged in$/ do
@@ -101,6 +102,10 @@ When /^I sign up without a password$/ do
   sign_up
 end
 
+When /^I sign up without a subscription plan$/ do
+  visit '/users/sign_up'
+end
+
 When /^I sign up with a mismatched password confirmation$/ do
   create_visitor
   @visitor = @visitor.merge(:password_confirmation => "please123")
@@ -128,10 +133,6 @@ When /^I edit my account details$/ do
   click_button "Update"
 end
 
-When /^I look at the list of users$/ do
-  visit '/'
-end
-
 ### THEN ###
 Then /^I should be signed in$/ do
   page.should have_content "Logout"
@@ -140,7 +141,6 @@ Then /^I should be signed in$/ do
 end
 
 Then /^I should be signed out$/ do
-  page.should have_content "Sign up"
   page.should have_content "Login"
   page.should_not have_content "Logout"
 end
@@ -158,19 +158,23 @@ Then /^I should see a successful sign up message$/ do
 end
 
 Then /^I should see an invalid email message$/ do
-  page.should have_content "Email is invalid"
+  page.should have_content "is invalid"
 end
 
 Then /^I should see a missing password message$/ do
-  page.should have_content "Password can't be blank"
+  page.should have_content "can't be blank"
 end
 
 Then /^I should see a missing password confirmation message$/ do
-  page.should have_content "Password doesn't match confirmation"
+  page.should have_content "doesn't match confirmation"
 end
 
 Then /^I should see a mismatched password message$/ do
-  page.should have_content "Password doesn't match confirmation"
+  page.should have_content "doesn't match confirmation"
+end
+
+Then /^I should see a missing subscription plan message$/ do
+  page.should have_content "Please select a subscription plan below"
 end
 
 Then /^I should see a signed out message$/ do
