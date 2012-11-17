@@ -51,3 +51,5 @@ gem "rolify", ">= 3.2.0"
 gem "simple_form", ">= 2.0.4"
 gem "stripe", ">= 1.7.4"
 gem "stripe_event", ">= 0.4.0"
+gem "quiet_assets", ">= 1.0.1", :group => :development
+gem "hub", ">= 1.10.2", :require => nil, :group => [:development]
