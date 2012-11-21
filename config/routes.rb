@@ -3,6 +3,12 @@ Myapp::Application.routes.draw do
   get "content/gold"
   get "content/silver"
   get "content/platinum"
+  match '/howitworks', 	to: 'home#howitworks'
+  match '/givingback', 	to: 'home#givingback'
+  match '/featuredprofessionals', to: 'home#featuredprofessionals'
+  match '/about', 		to: 'home#about'
+  match '/contact', 	to: 'home#contact'
+  
   authenticated :user do
     root :to => 'home#index'
   end
